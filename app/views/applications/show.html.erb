@@ -15,6 +15,7 @@ Name: <%= @application.name %>
 
 <section id="application-<%= @application.id %>" >
   <% @pets.each do |pet| %>
-    <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %></p>
+    <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <%= link_to "Adopt this Pet", "/applications/#{@application.id}/#{pet.id}", method: :patch %>
+</p>
   <% end %>
 </section>

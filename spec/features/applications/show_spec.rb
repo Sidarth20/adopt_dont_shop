@@ -47,7 +47,7 @@ RSpec.describe 'show page' do
     end
   end
 
-  it 'can add a pet to an application' do
+  it 'can search for pets for an application' do
     # Searching for Pets for an Application
     # As a visitor
     # When I visit an application's show page
@@ -75,8 +75,6 @@ RSpec.describe 'show page' do
     pet_2 = shelter.pets.create!(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
     pet_3 = shelter.pets.create!(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
 
-    # ApplicationPet.create!(pet: pet_1, application: application_1)
-    # ApplicationPet.create!(pet: pet_2, application: application_1)
     visit "/applications/#{application_1.id}"
 
     expect(page).to have_content(application_1.name)
@@ -87,9 +85,66 @@ RSpec.describe 'show page' do
     expect(page).to have_content(application_1.description)
     expect(page).to have_content(application_1.application_status)
     expect(page).to have_content("Add a Pet to this Application")
+
     fill_in('Search', with: 'Babe')
     click_button('Search')
+
     expect(page).to have_content('Babe')
     expect(current_path).to eq("/applications/#{application_1.id}")
+  end
+
+  it 'can add a pet for an application' do
+    # Add a Pet to an Application
+    # As a visitor
+    # When I visit an application's show page
+    # And I search for a Pet by name
+    # And I see the names Pets that match my search
+    # Then next to each Pet's name I see a button to "Adopt this Pet"
+    # When I click one of these buttons
+    # Then I am taken back to the application show page
+    # And I see the Pet I want to adopt listed on this application
+    application_1 = Application.create!(name:'Julius Caesar',
+                                      street_address: '123 Copperfield Lane',
+                                      city: 'Atlanta', state: 'GA',
+                                      zip_code: '30301',
+                                      description: 'I love dogs',
+                                      application_status: 'Pending')
+    application_2 = Application.create!(name:'Test',
+                                      street_address: '123 Copperfield Lane',
+                                      city: 'Atlanta', state: 'GA',
+                                      zip_code: '30301',
+                                      description: 'I love dogs',
+                                      application_status: 'Pending')
+    shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+    pet_1 = shelter.pets.create!(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
+    pet_2 = shelter.pets.create!(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
+    pet_3 = shelter.pets.create!(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
+
+    visit "/applications/#{application_1.id}"
+
+    expect(page).to have_content(application_1.name)
+    expect(page).to have_content(application_1.street_address)
+    expect(page).to have_content(application_1.city)
+    expect(page).to have_content(application_1.state)
+    expect(page).to have_content(application_1.zip_code)
+    expect(page).to have_content(application_1.description)
+    expect(page).to have_content(application_1.application_status)
+    expect(page).to have_content("Add a Pet to this Application")
+
+    fill_in('Search', with: 'Babe')
+    click_button('Search')
+
+    expect(page).to have_content('Babe')
+    expect(current_path).to eq("/applications/#{application_1.id}")
+
+    click_link('Adopt this Pet')
+    expect(current_path).to eq("/applications/#{application_1.id}")
+
+    app = ApplicationPet.create!(pet: pet_2, application: application_1)
+
+    within("#application-#{application_1.id}") do
+      expect(page).to have_content(pet_2.name)
+      save_and_open_page
+    end
   end
 end
