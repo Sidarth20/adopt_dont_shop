@@ -3,11 +3,12 @@ class ApplicationsController < ApplicationController
     @application = Application.find(params[:id])
 
     if params[:adopt_pet] && !@application.pets.include?(Pet.find(params[:adopt_pet]))
-      @pets_in_application = @application.add_pet(Pet.find(params[:adopt_pet]))
+      @pets_in_application = @application.pets << (Pet.find(params[:adopt_pet]))
     elsif params[:search]
-      @pets_search = Pet.search(params[:search])
+      @pets_search = Pet.adoptable.search(params[:search])
     elsif @application.application_status == 'Pending'
       @pets = @application.pets
+      # binding.pry
     end
   end
 
@@ -34,7 +35,7 @@ class ApplicationsController < ApplicationController
 
   def update
     application = Application.find(params[:id])
-    application.application_status = params[:status]
+    application.application_status = params[:application_status]
     application.description = params[:description]
     application.save!
     redirect_to "/applications/#{application.id}"
