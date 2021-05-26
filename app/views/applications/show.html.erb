@@ -4,6 +4,17 @@ Name: <%= @application.name %>
 <p>Address: <%= @application.street_address %>, <%= @application.city %>, <%= @application.state %> <%= @application.zip_code %></p>
 <p>Good Home Description: <%= @application.description %></p>
 <p>Application Status: <%= @application.application_status %></p>
+
+<% if @application.application_status == 'Pending'%>
+<h3> Pets in Application </h3>
+  <% @pets.each do |pet| %>
+    Pet: <%= pet.name %> <br>
+    Breed: <%= pet.breed %> <br>
+    Age: <%= pet.age %> <br>
+    <br>
+  <% end %>
+<% end %>
+
 <br>
 <% if @application.application_status == 'In Progress'%>
 <h3>Add a Pet to this Application</h3>
@@ -26,10 +37,9 @@ Name: <%= @application.name %>
 <br>
 <% if params[:adopt_pet] %>
   <% @pets_in_application.each do |pet| %>
-    Adoptable Pets: <%= link_to pet.name, "/pets/#{pet.id}" %><br>
-     <%= pet.breed %><br>
-     <%= pet.age %><br>
-     <%= pet.adoptable %><br>
+    Adoptable Pet: <%= link_to pet.name, "/pets/#{pet.id}" %><br>
+    Breed: <%= pet.breed %><br>
+    Age: <%= pet.age %><br>
   <% end %>
 <% end %>
 
