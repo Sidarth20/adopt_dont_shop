@@ -11,4 +11,12 @@ class Application < ApplicationRecord
     self.name.blank? || self.street_address.blank? || self.city.blank? ||
     self.state.blank? || self.zip_code.blank? || self.description.blank?
   end
+
+  def count_pets
+    pets.count
+  end
+
+  def add_pet(pet)
+    pets << pet
+  end
 end

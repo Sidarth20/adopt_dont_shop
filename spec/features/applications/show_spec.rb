@@ -133,6 +133,7 @@ RSpec.describe 'show page' do
 
     fill_in('Search', with: 'Babe')
     click_button('Search')
+    save_and_open_page
 
     expect(page).to have_content('Babe')
     expect(current_path).to eq("/applications/#{application_1.id}")
@@ -140,11 +141,8 @@ RSpec.describe 'show page' do
     click_link('Adopt this Pet')
     expect(current_path).to eq("/applications/#{application_1.id}")
 
-    app = ApplicationPet.create!(pet: pet_2, application: application_1)
-
     within("#application-#{application_1.id}") do
       expect(page).to have_content(pet_2.name)
-      save_and_open_page
     end
   end
 end

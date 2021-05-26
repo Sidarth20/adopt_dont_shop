@@ -4,18 +4,45 @@ Name: <%= @application.name %>
 <p>Address: <%= @application.street_address %>, <%= @application.city %>, <%= @application.state %> <%= @application.zip_code %></p>
 <p>Good Home Description: <%= @application.description %></p>
 <p>Application Status: <%= @application.application_status %></p>
-
 <br>
+<% if @application.application_status == 'In Progress' %>
 <h3>Add a Pet to this Application</h3>
-<%= form_with url: "/applications/#{@application.id}", method: :get, local: true do |f| %>
-  <%= f.label :search, "Search for a Pet's name" %>
-  <%= f.text_field :search %>
-  <%= f.submit "Search" %>
+  <%= form_with url: "/applications/#{@application.id}", method: :get, local: true do |f| %>
+    <%= f.label :search, "Search for a Pet's name" %>
+    <%= f.text_field :search %>
+    <%= f.submit "Search" %>
+  <% end %>
+<% end %>
+<br>
+
+<% if params[:search] %>
+  <section id="application-<%= @application.id %>" >
+    <% @pets_search.each do |pet| %>
+        <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <%= link_to "Adopt this Pet", "/applications/#{@application.id}", method: :get, params: {adopt_pet: pet} %> </p>
+    <% end %>
+  </section>
 <% end %>
 
-<section id="application-<%= @application.id %>" >
-  <% @pets.each do |pet| %>
-    <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <%= link_to "Adopt this Pet", "/applications/#{@application.id}/#{pet.id}", method: :patch %>
-</p>
+<br>
+<% if params[:adopt_pet] %>
+  <% @pets_in_application.each do |pet| %>
+    Adoptable Pets: <%= link_to pet.name, "/pets/#{pet.id}" %><br>
+     <%= pet.breed %><br>
+     <%= pet.age %><br>
+     <%= pet.adoptable %><br>
   <% end %>
-</section>
+<% end %>
+
+<br>
+
+<% if @application.application_status != 'Pending' %>
+  <% if @application.count_pets > 0 %>
+  <h3>Submit Application</h3>
+    <%= form_with url: "/applications/#{@application.id}", method: :patch, local: true do |f| %>
+      <%= f.hidden_field :application_status, value: 'Pending' %>
+      <%= f.label  "Why should the pet choose you?" %>
+      <%= f.text_area :description %>
+      <%= f.submit "Submit Application" %>
+    <% end %>
+  <% end %>
+<% end %>
