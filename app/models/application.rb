@@ -10,4 +10,10 @@ class Application < ApplicationRecord
   def count_pets
     pets.count
   end
+
+  def pending_applications
+    select('shelters.*')
+    .joins(pets: :shelter)
+    .where(application_status: 'Pending')
+  end
 end
