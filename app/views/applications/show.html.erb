@@ -7,11 +7,11 @@ Name: <%= @application.name %>
 
 <% if @application.application_status == 'Pending'%>
 <h3> Pets in Application </h3>
-  <% @pets.each do |pet| %>
-    Pet: <%= pet.name %> <br>
-    Breed: <%= pet.breed %> <br>
-    Age: <%= pet.age %> <br>
-    <br>
+<% @pets.each do |pet| %>
+  <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <br>
+  Breed: <%= pet.breed %> <br>
+  Age: <%= pet.age %> <br>
+  <br>
   <% end %>
 <% end %>
 
@@ -27,11 +27,9 @@ Name: <%= @application.name %>
 <br>
 
 <% if params[:search] %>
-  <section id="application-<%= @application.id %>" >
-    <% @pets_search.each do |pet| %>
-      <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <%= button_to "Adopt this Pet", "/applications/#{@application.id}", method: :get, params: {adopt_pet: pet} %> </p>
-    <% end %>
-  </section>
+  <% @pets_search.each do |pet| %>
+    <p> <%=link_to "Pet Name: #{pet.name}", "/pets/#{pet.id}" %> <%= button_to "Adopt this Pet", "/applications/#{@application.id}", method: :get, params: {adopt_pet: pet} %> </p>
+  <% end %>
 <% end %>
 
 <br>
@@ -50,7 +48,7 @@ Name: <%= @application.name %>
   <h3>Submit Application</h3>
     <%= form_with url: "/applications/#{@application.id}", method: :patch, local: true do |f| %>
       <%= f.hidden_field :application_status, value: 'Pending' %>
-      <%= f.label  "Why should the pet choose you?" %>
+      <%= f.label "Why should the pet choose you?" %>
       <%= f.text_area :description %>
       <%= f.submit "Submit Application" %>
     <% end %>

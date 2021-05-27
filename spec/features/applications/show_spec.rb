@@ -40,11 +40,8 @@ RSpec.describe 'show page' do
     expect(page).to have_content(application_1.zip_code)
     expect(page).to have_content(application_1.description)
     expect(page).to have_content(application_1.application_status)
-
-    within("#application-#{application_1.id}") do
-      expect(page).to have_content(pet_1.name)
-      expect(page).to have_content(pet_2.name)
-    end
+    expect(page).to have_content(pet_1.name)
+    expect(page).to have_content(pet_2.name)
   end
 
   it 'can search for pets for an application' do
@@ -63,7 +60,7 @@ RSpec.describe 'show page' do
                                       city: 'Atlanta', state: 'GA',
                                       zip_code: '30301',
                                       description: 'I love dogs',
-                                      application_status: 'Pending')
+                                      application_status: 'In Progress')
     application_2 = Application.create!(name:'Test',
                                       street_address: '123 Copperfield Lane',
                                       city: 'Atlanta', state: 'GA',
@@ -108,13 +105,59 @@ RSpec.describe 'show page' do
                                       city: 'Atlanta', state: 'GA',
                                       zip_code: '30301',
                                       description: 'I love dogs',
-                                      application_status: 'Pending')
-    application_2 = Application.create!(name:'Test',
+                                      application_status: 'In Progress')
+
+    shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+    pet_1 = shelter.pets.create!(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
+    pet_2 = shelter.pets.create!(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
+    pet_3 = shelter.pets.create!(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
+
+    visit "/applications/#{application_1.id}"
+
+    expect(page).to have_content(application_1.name)
+    expect(page).to have_content(application_1.street_address)
+    expect(page).to have_content(application_1.city)
+    expect(page).to have_content(application_1.state)
+    expect(page).to have_content(application_1.zip_code)
+    expect(page).to have_content(application_1.description)
+    expect(page).to have_content(application_1.application_status)
+    expect(page).to have_content("Add a Pet to this Application")
+    fill_in('Search', with: 'Babe')
+    click_button('Search')
+
+    expect(page).to have_link("Pet Name: Babe")
+    expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_button('Adopt this Pet')
+
+    click_button('Adopt this Pet')
+
+    expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_content(pet_2.name)
+    expect(page).to have_link("#{pet_2.name}")
+    expect(page).to have_content(pet_2.breed)
+    expect(page).to have_content(pet_2.age)
+  end
+
+  it 'can submit an application' do
+    # Submit an Application
+    # As a visitor
+    # When I visit an application's show page
+    # And I have added one or more pets to the application
+    # Then I see a section to submit my application
+    # And in that section I see an input to enter why I would make a good owner for these pet(s)
+    # When I fill in that input
+    # And I click a button to submit this application
+    # Then I am taken back to the application's show page
+    # And I see an indicator that the application is "Pending"
+    # And I see all the pets that I want to adopt
+    # And I do not see a section to add more pets to this application
+    application_1 = Application.create!(name:'Julius Caesar',
                                       street_address: '123 Copperfield Lane',
                                       city: 'Atlanta', state: 'GA',
                                       zip_code: '30301',
                                       description: 'I love dogs',
-                                      application_status: 'Pending')
+                                      application_status: 'In Progress')
+
     shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
     pet_1 = shelter.pets.create!(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
     pet_2 = shelter.pets.create!(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
@@ -133,16 +176,45 @@ RSpec.describe 'show page' do
 
     fill_in('Search', with: 'Babe')
     click_button('Search')
-    save_and_open_page
 
-    expect(page).to have_content('Babe')
+    expect(page).to have_link("Pet Name: Babe")
     expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_button('Adopt this Pet')
 
-    click_link('Adopt this Pet')
+    click_button('Adopt this Pet')
+
     expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_content(pet_2.name)
+    expect(page).to have_link("#{pet_2.name}")
+    expect(page).to have_content(pet_2.breed)
+    expect(page).to have_content(pet_2.age)
 
-    within("#application-#{application_1.id}") do
-      expect(page).to have_content(pet_2.name)
-    end
+    fill_in('Search', with: 'Bare')
+    click_button('Search')
+
+    expect(page).to have_link("Pet Name: Bare-y Manilow")
+    expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_button('Adopt this Pet')
+
+    click_button('Adopt this Pet')
+
+    expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_content(pet_1.name)
+    expect(page).to have_link("#{pet_1.name}")
+    expect(page).to have_content(pet_1.breed)
+    expect(page).to have_content(pet_1.age)
+
+    expect(page).to have_content("Submit Application")
+    expect(page).to have_button("Submit Application")
+    fill_in(:description, with: 'I want a pet that will keep me company & I have a yard')
+    click_button('Submit Application')
+
+    expect(current_path).to eq("/applications/#{application_1.id}")
+    expect(page).to have_content("Good Home Description: I want a pet that will keep me company & I have a yard")
+    expect(page).to have_content("Application Status: Pending")
+    expect(page).to have_content("Pets in Application")
+    expect(page).to have_link("Pet Name: #{pet_1.name}")
+    expect(page).to have_link("Pet Name: #{pet_2.name}")
+    expect(page).to have_no_content("Add a Pet to this Application")
   end
 end

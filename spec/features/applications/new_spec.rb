@@ -63,8 +63,9 @@ RSpec.describe 'new page' do
     fill_in('street_address', with: '123 Cherry Rd')
     fill_in('city', with: 'Denver')
     fill_in('state', with: 'CO')
-    fill_in('zip_code', with: '80216')
+    fill_in('zip_code', with: '')
     click_button('Submit')
+
     expect(current_path).to eq("/applications/new")
     expect(page).to have_content("Please fill in all fields")
   end
