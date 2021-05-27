@@ -8,7 +8,6 @@ class ApplicationsController < ApplicationController
       @pets_search = Pet.adoptable.search(params[:search])
     elsif @application.application_status == 'Pending'
       @pets = @application.pets
-      # binding.pry
     end
   end
 

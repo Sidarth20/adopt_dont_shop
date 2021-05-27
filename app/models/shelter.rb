@@ -20,10 +20,6 @@ class Shelter < ApplicationRecord
     find_by_sql("SELECT * FROM shelters ORDER BY name DESC")
   end
 
-  def self.pending_applications
-    
-  end
-
   def pet_count
     pets.count
   end
