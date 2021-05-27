@@ -1,0 +1,12 @@
+<h1>Shelters in Reverse Alphabetical Order</h1>
+
+<% @shelters.each do |shelter| %>
+  <p> <%= shelter.name %> </p>
+<% end %>
+
+<h2>Shelter's with Pending Applications</h2>
+<% @applications.pending_applications.each do |shelter| %>
+<section id="pending-<%= shelter.id %>">
+  <p> <%= shelter.name %> </p>
+</section>
+<% end %>

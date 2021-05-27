@@ -1,14 +1,13 @@
 class ApplicationsController < ApplicationController
   def show
     @application = Application.find(params[:id])
-    @pets = @application.pets
-    if params[:search]
-      @pets = Pet.search(params[:search])
-      if @pets == params[:search]
-        @pets.each do |pet|
-          pet.name
-        end
-      end
+
+    if params[:adopt_pet] && !@application.pets.include?(Pet.find(params[:adopt_pet]))
+      @pets_in_application = @application.pets << (Pet.find(params[:adopt_pet]))
+    elsif params[:search]
+      @pets_search = Pet.adoptable.search(params[:search])
+    elsif @application.application_status == 'Pending'
+      @pets = @application.pets
     end
   end
 
@@ -31,5 +30,13 @@ class ApplicationsController < ApplicationController
       @application.save
       redirect_to "/applications/#{@application.id}"
     end
+  end
+
+  def update
+    application = Application.find(params[:id])
+    application.application_status = params[:application_status]
+    application.description = params[:description]
+    application.save!
+    redirect_to "/applications/#{application.id}"
   end
 end
