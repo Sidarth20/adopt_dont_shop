@@ -217,4 +217,35 @@ RSpec.describe 'show page' do
     expect(page).to have_link("Pet Name: #{pet_2.name}")
     expect(page).to have_no_content("Add a Pet to this Application")
   end
+
+  it 'has no pets on an application' do
+    # No Pets on an Application
+    # As a visitor
+    # When I visit an application's show page
+    # And I have not added any pets to the application
+    # Then I do not see a section to submit my application
+    application_1 = Application.create!(name:'Julius Caesar',
+                                      street_address: '123 Copperfield Lane',
+                                      city: 'Atlanta', state: 'GA',
+                                      zip_code: '30301',
+                                      description: 'I love dogs',
+                                      application_status: 'In Progress')
+
+    shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+    pet_1 = shelter.pets.create!(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
+    pet_2 = shelter.pets.create!(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
+    pet_3 = shelter.pets.create!(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
+
+    visit "/applications/#{application_1.id}"
+
+    expect(page).to have_content(application_1.name)
+    expect(page).to have_content(application_1.street_address)
+    expect(page).to have_content(application_1.city)
+    expect(page).to have_content(application_1.state)
+    expect(page).to have_content(application_1.zip_code)
+    expect(page).to have_content(application_1.description)
+    expect(page).to have_content(application_1.application_status)
+    expect(page).to have_content("Add a Pet to this Application")
+    expect(page).to have_button("Search")
+  end
 end
