@@ -88,5 +88,20 @@ RSpec.describe Application, type: :model do
       application.save
       application.form_incomplete?.should == true
     end
+
+    it 'can count pets' do
+      @shelter = Shelter.create(name: 'Happy Pets', city: 'Aurora, CO', foster_program: false, rank: 9)
+      @pet_1 = @shelter.pets.create!(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: @shelter.id)
+      @application_1 = Application.create!(name:'Julius Caesar',
+                                        street_address: '123 Copperfield Lane',
+                                        city: 'Atlanta', state: 'GA',
+                                        zip_code: '30301',
+                                        description: 'I love dogs',
+                                        application_status: 'Pending')
+      ApplicationPet.create!(pet: @pet_1, application: @application_1)
+      ApplicationPet.create!(pet: @pet_1, application: @application_1)
+
+      expect(@application_1.count_pets).to eq(2)
+    end
   end
 end

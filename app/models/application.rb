@@ -1,6 +1,7 @@
 class Application < ApplicationRecord
   has_many :application_pets
   has_many :pets, through: :application_pets
+  has_many :shelters, through: :pets
 
   def form_incomplete?
     self.name.blank? || self.street_address.blank? || self.city.blank? ||
